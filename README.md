@@ -1,3 +1,5 @@
+This is a repository of my implentation of some grasp experiments on Franka Emika Robot.
+
 # Some useful functions of `panda-py`
 
 1. get position of end-effector
@@ -88,3 +90,7 @@ so you should modify the virtual wall value to your need:
 ```
 
 then just re-build the `franka-interface` package and enjoy your code!
+
+# Miscs
+
+The repository is under development. `requirements.txt` may not be complete. Feel free to contact `elena.cliu at gmail.com` if you meet any problem.

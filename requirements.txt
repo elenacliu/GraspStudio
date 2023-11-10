@@ -1,2 +1,8 @@
-gin-config
 panda-python
+frankapy
+pyrealsense2
+scipy
+numpy
+pybullet
+rospy
+catkin_tools
