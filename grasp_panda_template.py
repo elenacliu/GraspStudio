@@ -15,8 +15,9 @@ from motion_solver import PybulletMotionSolver
 
 
 class PandaGrasp(GraspBot):
-    def __init__(self, max_gripper_width=0.08, gripper_speed=0.1, move_speed=0.2, ik_solver=None, camera_type='realsense', hostname='172.16.0.2', debug=False) -> None:
-        super().__init__(max_gripper_width, move_speed, ik_solver, camera_type)
+    def __init__(self, max_gripper_width=0.08, gripper_speed=0.1, move_speed=0.2, ik_solver=None, camera_type='realsense', hostname='172.16.0.2', remote_server_config='./config/credential.yml', debug=False) -> None:
+        super().__init__(max_gripper_width, move_speed, ik_solver, camera_type, 
+                         os.path.join(os.path.dirname(os.path.realpath(__file__)), remote_server_config))
         self.gripper_speed = gripper_speed
         self.panda = panda_py.Panda(hostname)            # initialize panda (franka emika) robot arm
         self.gripper = libfranka.Gripper(hostname)       # initialize franka gripper
