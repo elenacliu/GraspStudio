@@ -23,7 +23,7 @@ from typing import List, Type
 from numpy.typing import NDArray
 
 from grasp import Grasp, GraspConfig
-from motion_solver import PybulletMotionSolver
+from motion_solver import PybulletMotionSolverConfig
 
 
 @dataclass
@@ -92,5 +92,5 @@ class PandaGrasp(Grasp):
 
 if __name__=='__main__':
     # panda-py must provide third-party solver
-    robot = PandaGraspConfig().setup()
+    robot = PandaGraspConfig(motion_solver_config=PybulletMotionSolverConfig()).setup()
     robot.grasp_loop('rgbd')
