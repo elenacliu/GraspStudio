@@ -6,3 +6,5 @@ numpy
 pybullet
 rospy
 catkin_tools
+opencv-python
+tyro

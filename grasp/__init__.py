@@ -1,1 +1,1 @@
-from .grasp import GraspBot
+from .grasp import Grasp, GraspConfig

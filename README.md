@@ -1,4 +1,4 @@
-This is a repository of my implentation of some grasp experiments on Franka Emika Robot.
+This is a repository of my implentation of some real robot grasp experiments on Franka Emika Robot.
 
 # Some useful functions of `panda-py`
 
@@ -94,3 +94,11 @@ then just re-build the `franka-interface` package and enjoy your code!
 # Miscs
 
 The repository is under development. `requirements.txt` may not be complete. Feel free to contact `elena.cliu at gmail.com` if you meet any problem.
+
+# TODOs
+
+1. add support for pybullet
+2. pip requirements.txt sync
+3. readme
+  - how to use the repo
+  - how to install the required environment
