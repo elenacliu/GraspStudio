@@ -51,12 +51,16 @@ class PandaGrasp(Grasp):
     def goto_pose(self, pose: NDArray):
         self.panda.move_to_pose(pose, speed_factor=self.config.move_speed)
 
-    def go_to_start(self):
-        # first go to the home position with gripper open
-        self.panda.move_to_joint_position(self.initial_joints, speed_factor=self.config.move_speed)
-        # open gripper
+    def close_gripper(self):
         self.gripper.move(width=0.0, speed=self.config.gripper_speed)
+
+    def open_gripper(self):
         self.gripper.move(width=self.config.max_gripper_width, speed=self.config.gripper_speed)
+    
+    def grasp(self):
+        self.gripper.grasp(width=0.0, speed=self.config.gripper_speed, force=self.config.max_grasp_force,
+                            epsilon_inner=self.config.epsilon_inner, epsilon_outer=self.config.epsilon_outer)
+        return self.gripper.read_once().is_grasped
 
     def get_cam_to_robot_pose(self):
         gripper_transform = self.panda.get_pose()

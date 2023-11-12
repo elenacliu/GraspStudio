@@ -48,6 +48,16 @@ class FrankaGrasp(Grasp):
     def goto_joints(self, joints: List, duration=3, use_impedance=False):
         self.franka_arm.goto_joints(joints, use_impedance=use_impedance, duration=duration)
 
+    def close_gripper(self):
+        self.franka_arm.close_gripper(grasp=False)
+
+    def open_gripper(self):
+        self.franka_arm.open_gripper()
+    
+    def grasp(self):
+        self.franka_arm.close_gripper(grasp=True)
+        return self.franka_arm.get_gripper_is_grasped()
+
     @property
     def pose(self) -> NDArray:
         return self.franka_arm.get_pose().matrix
@@ -62,19 +72,20 @@ class FrankaGrasp(Grasp):
         return cam_transform
 
     def execute_pick_and_place(self, pre_grasp_transform, grasp_transform, after_grasp_transform, dst_joints):
-        self.franka_arm.open_gripper()
+        self.open_gripper()
 
         if self.ik_solver is not None:
-            current_joints = self.franka_arm.get_joints()
+            current_joints = self.joints
             pre_grasp_joints = self.ik_solver.ik(current_joints, pre_grasp_transform)
             grasp_joints = self.ik_solver.ik(current_joints, grasp_transform)
             after_grasp_joints = self.ik_solver.ik(current_joints, after_grasp_transform)
 
-            self.franka_arm.goto_joints(pre_grasp_joints, ignore_virtual_walls=True)
+            self.goto_joints(pre_grasp_joints, ignore_virtual_walls=True)
             time.sleep(0.03)
 
-            self.franka_arm.goto_joints(grasp_joints, ignore_virtual_walls=True, use_impedance=True)
-            self.franka_arm.close_gripper()
+            self.goto_joints(grasp_joints, ignore_virtual_walls=True, use_impedance=True)
+            grasp_res = self.grasp()
+
             time.sleep(0.03)
 
             self.goto_joints(after_grasp_joints, ignore_virtual_walls=True)
@@ -84,7 +95,7 @@ class FrankaGrasp(Grasp):
             time.sleep(0.03)
 
             self.goto_pose(grasp_transform)
-            self.franka_arm.close_gripper()
+            grasp_res = self.grasp()
             time.sleep(0.03)
 
             self.goto_pose(after_grasp_transform, use_impedance=False)

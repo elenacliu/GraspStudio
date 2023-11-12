@@ -21,8 +21,8 @@ from typing import Type, Optional, List
 from numpy.typing import NDArray
 import time
 
-from cameras import CameraConfig, RealSenseCameraConfig
-from motion_solver import PybulletMotionSolverConfig
+from cameras import CameraConfig, RealSenseCameraConfig, Camera
+from motion_solver import PybulletMotionSolverConfig, MotionSolver
 from config import InstantiateConfig
 
 
@@ -43,6 +43,8 @@ class GraspConfig(InstantiateConfig):
 
 class Grasp:
     config: GraspConfig
+    camera: Camera
+    ik_solver: Optional[MotionSolver]
 
     def __init__(self, config : GraspConfig) -> None:
         self.config = config
@@ -65,7 +67,7 @@ class Grasp:
     def open_gripper(self):
         raise NotImplementedError
     
-    def grasp(self):
+    def grasp(self) -> bool:
         raise NotImplementedError
 
     @property
@@ -80,14 +82,17 @@ class Grasp:
         raise NotImplementedError
     
     def go_to_start(self, **kwargs):
-        pass
+        # first go to the home position with gripper close and open
+        self.goto_joints(self.config.initial_joints, **kwargs)
+        self.close_gripper()
+        self.open_gripper()
     
     def grasp_once(self, method, **kwargs):
-        pass
+        raise NotImplementedError
 
     def grasp_loop(self, method, **kwargs):
         while True:
-            self.grasp_once(method, kwargs=kwargs)
+            self.grasp_once(method, **kwargs)
 
     def generate_grasping_trajectories(self, grasp_pose_matrix, pre_dis=0.2, after_height=0.25):
         back_matrix = np.eye(4)
@@ -97,31 +102,46 @@ class Grasp:
         after_g2b_matrix[2,3] += after_height
         return pre_g2b_matrix, after_g2b_matrix
     
-    def execute_pick_and_place(self, pre_grasp_transform, grasp_transform, after_grasp_transform, dst_transform):
+    def execute_pick_and_place(self, pre_grasp_transform, grasp_transform, after_grasp_transform, dst_transform, **kwargs):
         if self.ik_solver is not None:
-            current_joints = self.franka_arm.get_joints()
+            current_joints = self.joints
             pre_grasp_joints = self.ik_solver.ik(current_joints, pre_grasp_transform)
             grasp_joints = self.ik_solver.ik(current_joints, grasp_transform)
             after_grasp_joints = self.ik_solver.ik(current_joints, after_grasp_transform)
             dst_joints = self.ik_solver.ik(current_joints, dst_transform)
 
-            self.goto_joints(pre_grasp_joints, ignore_virtual_walls=True)
+            self.goto_joints(pre_grasp_joints, **kwargs)
             time.sleep(0.03)
 
-            self.goto_joints(grasp_joints, ignore_virtual_walls=True, use_impedance=True)
-            self.franka_arm.close_gripper()
+            self.goto_joints(grasp_joints, **kwargs)
+            grasp_res = self.grasp()
+
+            if grasp_res:
+                print('successful grasp')
+            else:
+                print('failed grasp')
+
             time.sleep(0.03)
 
-            self.goto_joints(after_grasp_joints, ignore_virtual_walls=True)
+            self.goto_joints(after_grasp_joints, **kwargs)
             time.sleep(0.03)
+
+            self.goto_joints(dst_joints, **kwargs)
+            self.open_gripper()
         else:
-            self.goto_pose(pre_grasp_transform, duration=5, use_impedance=False)
+            self.goto_pose(pre_grasp_transform, **kwargs)
             time.sleep(0.03)
 
-            self.goto_pose(grasp_transform)
-            self.franka_arm.close_gripper()
+            self.goto_pose(grasp_transform, **kwargs)
+            grasp_res = self.grasp()
+            if grasp_res:
+                print('successful grasp')
+            else:
+                print('failed grasp')
             time.sleep(0.03)
 
-            self.goto_pose(after_grasp_transform, use_impedance=False)
+            self.goto_pose(after_grasp_transform, **kwargs)
             time.sleep(0.03)
+            self.goto_pose(dst_transform, **kwargs)
+            self.open_gripper()
         
