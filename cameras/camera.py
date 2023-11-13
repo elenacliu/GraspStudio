@@ -18,6 +18,7 @@ from typing import Type, Tuple, Optional
 from numpy.typing import NDArray
 import numpy as np
 import torch
+import cv2
 
 from config import InstantiateConfig
 
@@ -27,19 +28,22 @@ class CameraConfig(InstantiateConfig):
     """Camera Config"""
     _target: Type = field(default_factory=lambda : Camera)
     # focal length of x axis
-    fx: float
+    fx: float = 0.0
     # focal length of y axis
-    fy: float
+    fy: float = 0.0
     # optical center of x
-    ppx: float
+    ppx: float = 0.0
     # optical center of y
-    ppy: float
+    ppy: float = 0.0
     # resolution x (width)
-    w: int
+    w: int = 0.0
     # resolution y (height)
-    h: int
+    h: int = 0.0
+    # image size
+    image_size_w: int = 1280
+    image_size_h: int = 720
     # calibration matrix (camera on hand or camera on base)
-    calibration: NDArray[np.float64]
+    calibration: NDArray[np.float64] = None
     # depth camera focal length of x axis (optional)
     depth_fx: Optional[float] = None
     # depth camera focal length of y axis (optional)
@@ -54,9 +58,11 @@ class CameraConfig(InstantiateConfig):
     depth_h: Optional[int] = None
 
 
-@dataclass
 class Camera:
     config: CameraConfig
+
+    def __init__(self, config : CameraConfig):
+        self.config = config
     
     def rgb(self) -> NDArray:
         raise NotImplementedError('You should use a specified subclass!')
@@ -64,8 +70,20 @@ class Camera:
     def rgbd(self) -> Tuple[NDArray, NDArray]:
         raise NotImplementedError('You should use a specified subclass!')
 
-    def depth_to_point_cloud(self) -> NDArray:
-        depth_img = self.rgbd()
+    def depth_to_point_cloud(self, organized=False) -> Tuple[NDArray, NDArray]:
+        """
+        organized: bool
+                whether to keep the cloud in image shape (H,W,3)
+        """
+        color_img, depth_img = self.rgbd()
+        color_img = np.array(color_img, dtype=np.float32) / 255.0
+        depth_img = np.array(depth_img / 1000, dtype=np.float32)
+
+        # depth image resize to the color image size
+        # just use the original size of depth image and color image
+        # depth_img = cv2.resize(depth_img, (self.config.image_size_w, self.config.image_size_h), interpolation=cv2.INTER_NEAREST)
+        # color_img = cv2.resize(color_img, (self.config.image_size_w, self.config.image_size_h), interpolation=cv2.INTER_LINEAR)
+        # the scale should be considering again
         h, w = depth_img.shape
 
         # scale camera parameters
@@ -80,11 +98,15 @@ class Camera:
 
         indices = torch.from_numpy(np.indices((h, w), dtype=np.float32).transpose(1,2,0))
         
-        z_e = depth_img
+        z_e = torch.from_numpy(depth_img)
         x_e = (indices[..., 1] - x_offset) * z_e / fx
         y_e = (indices[..., 0] - y_offset) * z_e / fy
-        point_cloud = torch.stack([x_e, y_e, z_e], axis=-1)  # Shape: [H x W x 3]
-        return point_cloud
+        point_cloud = torch.stack([x_e, y_e, z_e], axis=-1).numpy()  # Shape: [H x W x 3]
+
+        if not organized:
+            color_img = color_img.reshape(-1, 3)
+            point_cloud = point_cloud.reshape(-1, 3)
+        return color_img, point_cloud
 
     @property
     def intrinsic(self):

@@ -34,8 +34,8 @@ class GraspConfig(InstantiateConfig):
                                                         [-0.99519613,  0.08965247,  0.03933318,  0.02753368],
                                                         [-0.04034645, -0.00951747, -0.99914042,  0.6019472],
                                                         [ 0.,          0. ,         0. ,         1.        ]])
-    initial_joints: List[float] = [-0.02159332, -0.80462398,  0.00235787, -2.16951674,  0.0373164, 1.35462832, 0.8590827]
-    place_joints: List[float] = [1.8, -0.7855447937431189, 0.0003260311383163978, -2.3561892689822015, 0.000589521053350634, 1.5704794415504568, 0.7849731242977285]
+    initial_joints: NDArray = np.array([-0.02159332, -0.80462398,  0.00235787, -2.16951674,  0.0373164, 1.35462832, 0.8590827])
+    place_joints: NDArray = np.array([1.8, -0.7855447937431189, 0.0003260311383163978, -2.3561892689822015, 0.000589521053350634, 1.5704794415504568, 0.7849731242977285])
     camera_config: CameraConfig = field(default_factory=lambda : RealSenseCameraConfig)
     motion_solver_config : Optional[PybulletMotionSolverConfig] = None
     debug : bool = False
@@ -84,8 +84,6 @@ class Grasp:
     def go_to_start(self, **kwargs):
         # first go to the home position with gripper close and open
         self.goto_joints(self.config.initial_joints, **kwargs)
-        self.close_gripper()
-        self.open_gripper()
     
     def grasp_once(self, method, **kwargs):
         raise NotImplementedError

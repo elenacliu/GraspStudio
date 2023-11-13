@@ -26,6 +26,7 @@ from .camera import CameraConfig, Camera
 class RealSenseCameraConfig(CameraConfig):
     _target: Type = field(default_factory=lambda : RealSenseCamera)
     exposure: float = 500.0
+    max_depth_value: float = 800.0
 
 
 class RealSenseCamera(Camera):
@@ -88,4 +89,7 @@ class RealSenseCamera(Camera):
         depth_frame = frames.get_depth_frame()
         depth_frame = self.spatial.process(depth_frame)
         depth_frame = self.hole_filling.process(depth_frame)
-        return color_rgb, depth_frame
+
+        depth_image = np.asanyarray(depth_frame.get_data())
+        depth_image[depth_image > self.config.max_depth_value] = 0.
+        return color_rgb, depth_image

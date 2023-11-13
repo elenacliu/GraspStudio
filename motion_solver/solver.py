@@ -18,7 +18,7 @@ import pybullet as p
 import pybullet_data as pd
 import numpy as np
 from dataclasses import dataclass, field
-from typing import List, Type
+from typing import Type, Tuple
 from scipy.spatial.transform import Rotation
 
 from config import InstantiateConfig
@@ -41,9 +41,9 @@ class MotionSolver:
 @dataclass
 class PybulletMotionSolverConfig(MotionSolverConfig):
     _target: Type = field(default_factory=lambda : PybulletMotionSolver)
-    upperlimits: List[float] = FrankaConstants.JOINT_LIMITS_UPPER.value
-    lowerlimits: List[float] = FrankaConstants.JOINT_LIMITS_LOWER.value
-    jointranges: List[float] = FrankaConstants.JOINT_RANGES.value
+    upperlimits: Tuple = FrankaConstants.JOINT_LIMITS_UPPER.value
+    lowerlimits: Tuple = FrankaConstants.JOINT_LIMITS_LOWER.value
+    jointranges: Tuple = FrankaConstants.JOINT_RANGES.value
     robot_file: str = 'franka_panda/panda.urdf'
 
 
@@ -88,19 +88,19 @@ class PybulletMotionSolver(MotionSolver):
         target_joints = list(target_joints)
 
         for i in range(6):
-            while target_joints[i] > self.upperlimits[i]:
+            while target_joints[i] > self.config.upperlimits[i]:
                 target_joints[i] -= np.pi * 2
-            while target_joints[i] < self.lowerlimits[i]:
+            while target_joints[i] < self.config.lowerlimits[i]:
                 target_joints[i] += np.pi * 2
 
-        if  target_joints[6] > self.upperlimits[6]-0.3:
+        if  target_joints[6] > self.config.upperlimits[6]-0.3:
             target_joints[6] -= np.pi
         
-        if  target_joints[6] < self.lowerlimits[6]+0.3:
+        if  target_joints[6] < self.config.lowerlimits[6]+0.3:
             target_joints[6] += np.pi
 
         for i in range(7):
-            if target_joints[i] >= self.upperlimits[i] or target_joints[i] <= self.lowerlimits[i]:
+            if target_joints[i] >= self.config.upperlimits[i] or target_joints[i] <= self.config.lowerlimits[i]:
                 print('joint {} out of range'.format(i))
                 raise ValueError
         target_joints = np.array(target_joints[:7]).tolist()

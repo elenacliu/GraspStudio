@@ -2,5 +2,8 @@ __pycache__
 config/credential.yml
 grasp_franka.py
 grasp_panda.py
-license/*
+**/franka_my.py
+**/license/**
 *.so
+models/*
+.TimeRecord

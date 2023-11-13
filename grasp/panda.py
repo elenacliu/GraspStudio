@@ -64,11 +64,11 @@ class PandaGrasp(Grasp):
 
     def get_cam_to_robot_pose(self):
         gripper_transform = self.panda.get_pose()
-        cam_transform = gripper_transform @ self.cam2gripper_transformation
+        cam_transform = gripper_transform @ self.config.camera_config.calibration
         return cam_transform
 
-    def execute_pick_and_place(self, pre_grasp_transform, grasp_transform, after_grasp_transform, dst_joints):
-        self.gripper.move(width=self.max_gripper_width, speed=self.gripper_speed)
+    def execute_pick_and_place(self, pre_grasp_transform, grasp_transform, after_grasp_transform, dst_joints, **kwargs):
+        self.gripper.move(width=self.config.max_gripper_width, speed=self.config.gripper_speed)
         
         if self.ik_solver is not None:
             current_joints = self.panda.q
@@ -76,10 +76,10 @@ class PandaGrasp(Grasp):
             grasp_joints = np.array(self.ik_solver.ik(current_joints, grasp_transform))
             after_grasp_joints = np.array(self.ik_solver.ik(current_joints, after_grasp_transform))
 
-            self.panda.move_to_joint_position(pre_grasp_joints, speed_factor=self.move_speed)
+            self.panda.move_to_joint_position(pre_grasp_joints, speed_factor=self.config.move_speed)
             time.sleep(0.03)
             
-            self.panda.move_to_joint_position(grasp_joints, speed_factor=self.move_speed)
+            self.panda.move_to_joint_position(grasp_joints, speed_factor=self.config.move_speed)
             self.panda.recover()
             time.sleep(5)
             
