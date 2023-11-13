@@ -25,6 +25,16 @@ pass
 
 # Notes of `franka-py` and `franka-interface`
 
+You should first enter the directory of frankapy and start the control pc. (In my case, the control pc is the same with the client pc)
+
+```bash
+cd /path/to/frankapy
+conda activate your_env_that_contains_frankapy
+bash ./bash_scripts/start_control_pc.sh -i localhost
+```
+
+Sometimes you might want to change the mode to "user mode". The franka-interface in the control pc may get down in this mode, so you should close the terminals and rerun `bash ./bash_scripts/start_control_pc.sh -i localhost`.
+
 Sometimes the arm will suddenly stop (but joints do not exceed the upper and lower limits), that's possibly because it collides with "virtual wall" defined in code repository:
 
 ```c++
