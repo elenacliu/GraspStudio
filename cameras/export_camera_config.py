@@ -25,14 +25,13 @@ def export_realsense_configuration(config_path):
     depth_profile = rs.video_stream_profile(profile.get_stream(rs.stream.depth))
     depth_intrinsics = depth_profile.get_intrinsics()
 
+    print(color_intrinsics.width, color_intrinsics.height)
+
     config = {
         'name': rs.camera_info.name,
         'serial_number': rs.camera_info.serial_number,
         'color_intriniscs': color_intrinsics,
         'depth_intrinsics': depth_intrinsics
     }
-    with open(config_path, 'w') as f:
-        yaml.dump(config, f)
 
-if __name__=='__main__':
-    export_realsense_configuration('../config/realsenseD415.yml')
+    print(config)

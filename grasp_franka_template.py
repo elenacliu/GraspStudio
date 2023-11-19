@@ -1,20 +1,29 @@
+# Copyright 2023 Chang Liu.  All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
 import numpy as np
 from scipy.spatial.transform import Rotation
 import time
 from autolab_core import RigidTransform
 from frankapy import FrankaArm
-import subprocess
 import os
-import random
-from ipdb import set_trace
 
-from grasp import GraspBot
-from graspnetAPI import GraspGroup
-from utils import convert_grasp_to_transformation_matrix, Rz
-from motion_solver import PybulletMotionSolver
+from grasp import Grasp
 
 
-class FrankaGrasp(GraspBot):
+class FrankaGrasp(Grasp):
     def __init__(self, max_gripper_width=0.08, move_speed=0.1, ik_solver=None, camera_type='realsense', remote_server_config='./config/credential.yml', debug=False) -> None:
         super().__init__(max_gripper_width, move_speed, ik_solver, camera_type, 
                          os.path.join(os.path.dirname(os.path.realpath(__file__)), remote_server_config))

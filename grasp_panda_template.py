@@ -1,20 +1,29 @@
-from panda_py import libfranka, controllers
-import panda_py
-from panda_py import constants
-import numpy as np
-from scipy.spatial.transform import Rotation
-import os
-import subprocess
-import time
-import random
+# Copyright 2023 Chang Liu.  All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-from grasp import GraspBot
-from graspnetAPI import GraspGroup
-from utils import convert_grasp_to_transformation_matrix, Rz
+
+from panda_py import libfranka
+import panda_py
+import numpy as np
+import os
+import time
+
+from grasp import Grasp
 from motion_solver import PybulletMotionSolver
 
 
-class PandaGrasp(GraspBot):
+class PandaGrasp(Grasp):
     def __init__(self, max_gripper_width=0.08, gripper_speed=0.1, move_speed=0.2, ik_solver=None, camera_type='realsense', hostname='172.16.0.2', remote_server_config='./config/credential.yml', debug=False) -> None:
         super().__init__(max_gripper_width, move_speed, ik_solver, camera_type, 
                          os.path.join(os.path.dirname(os.path.realpath(__file__)), remote_server_config))
