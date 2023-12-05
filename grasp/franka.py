@@ -99,7 +99,8 @@ class FrankaGrasp(Grasp):
             self.goto_joints(pre_grasp_joints, ignore_virtual_walls=True)
             time.sleep(0.03)
 
-            self.goto_joints(grasp_joints, ignore_virtual_walls=True, use_impedance=True)
+            # self.goto_joints(grasp_joints, ignore_virtual_walls=True, use_impedance=True)
+            self.goto_joints(grasp_joints, ignore_virtual_walls=True, use_impedance=False)
             grasp_res = self.grasp()
 
             time.sleep(0.03)

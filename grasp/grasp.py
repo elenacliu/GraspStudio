@@ -84,7 +84,7 @@ class Grasp:
     def go_to_start(self, **kwargs):
         # first go to the home position with gripper close and open
         self.goto_joints(self.config.initial_joints, **kwargs)
-        self.close_gripper()
+        # self.close_gripper()
         self.open_gripper()
     
     def grasp_once(self, method, **kwargs):
