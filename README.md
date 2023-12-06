@@ -1,29 +1,51 @@
-This is a repository of my implentation of some real robot grasp experiments on Franka Emika Robot.
+This is a repository of my implentation of real robot grasp experiments on Franka Emika Robot. Now I only provide support on real Franka Emika robots, maybe simulators (like PyBullet) will be supported later for whom are potentially interested in robotics and EmbodiedAI but without accessible robots.
 
-# Some useful functions of `panda-py`
+# Features
 
-1. get position of end-effector
+- 🌟 decoupled components
+- 🌟 same code on all different robot configurations
 
-```
-get_position(self: panda_py._core.Panda) → numpy.ndarray[numpy.float64[3, 1]]
+# Code Structure
 
-    Current end-effector position in robot base frame.
+I decompose the whole grasping system into 4 components:
 
-```
+1. motion execution (of different control package), under directory `grasp`
+2. end-effector execution (of different end-effectors, mostly grippers), under directory `end_effector`
+3. motion solver, under `motion_solver`
+4. camera/sensor input, under `cameras`
 
-2. get joint of robot arm
+Each components is expected to be independent from others (Ideally! but sometimes it might be hard). If you want use your own modules, feel free to add your own class by inheriting the abstract class and implementing the necessary interfaces. 
 
-```
-@property
-def q(self) -> numpy.ndarray[numpy.float64, _Shape[7, 1]]:
+Do not forget to implement the corresponding `Config` class for your class!
+
+`grasp_franka_template.py` is one example of how to instantiate your own grasp class to execute grasp. For example, if you choose to execute grasp via `frankapy` pacakge's API, all you need to do is to create your own subclass `MyFrankaGrasp` and `MyFrankaGraspConfig`:
+
+
+```python
+class MyFrankaGrasp(FrankaGrasp):
+  config: MyFrankaGraspConfig
+
+  def __init__(self, config: MyFrankaGraspConfig):
+    super().__init__(config=config)
+
+  def grasp_once(self, method, **kwargs):
+    """Implement your grasp algorithm here.
     """
-    :type: numpy.ndarray[numpy.float64, _Shape[7, 1]]
-    """
-pass
+    pass
 ```
 
+In fact, you just need to implement the `grasp_once` function.
 
-# Notes of `franka-py` and `franka-interface`
+# Configuration System
+
+I use the open-source repository [tyro](https://github.com/brentyi/tyro) as the configuration system. You can refer to its documentation for usage.
+
+# Notes
+
+
+## Grasp
+
+### `franka-py` and `franka-interface`
 
 You should first enter the directory of frankapy and start the control pc. (In my case, the control pc is the same with the client pc)
 
@@ -101,14 +123,27 @@ so you should modify the virtual wall value to your need:
 
 then just re-build the `franka-interface` package and enjoy your code!
 
+# Acknowledgement
+
+## Franka Packages
+
+Frankapy: Zhang, Kevin, Mohit Sharma, Jacky Liang, and Oliver Kroemer. "A modular robotic arm control stack for research: Franka-interface and frankapy." arXiv preprint arXiv:2011.02398 (2020).
+
+Pandapy: Elsner, J. (2023). Taming the Panda with Python: A powerful duo for seamless robotics programming and integration. SoftwareX, 24, 101532.
+
+## Configuration Systems
+Tyro: https://brentyi.github.io/tyro
+
+## Simulators
+
+
 # Miscs
 
 The repository is under development. `requirements.txt` may not be complete. Feel free to contact `elena.cliu at gmail.com` if you meet any problem.
 
+
+
 # TODOs
 
-1. add support for pybullet
-2. pip requirements.txt sync
-3. readme
-  - how to use the repo
-  - how to install the required environment
+- [ ] add support for more motion solvers
+- [ ] add support for pybullet
