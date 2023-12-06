@@ -10,7 +10,7 @@ This is a repository of my implentation of real robot grasp experiments on Frank
 I decompose the whole grasping system into 4 components:
 
 1. motion execution (of different control package), under directory `grasp`
-2. end-effector execution (of different end-effectors, mostly grippers), under directory `end_effector`
+2. end-effector execution (of different end-effectors, mostly grippers), under directory `end_effector` (not now, but do have plans for that.)
 3. motion solver, under `motion_solver`
 4. camera/sensor input, under `cameras`
 
