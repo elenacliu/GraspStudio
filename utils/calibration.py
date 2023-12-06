@@ -17,3 +17,7 @@ def get_cam2gripper_transformation(mode='2023-10-13'):
     else:
         cam2gripper_transformation = None
     return cam2gripper_transformation
+
+
+if __name__=='__main__':
+    print(get_cam2gripper_transformation('latest'))

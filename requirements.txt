@@ -2,7 +2,9 @@ panda-python
 frankapy
 pyrealsense2
 scipy
-numpy
+numpy>=1.22.0
 pybullet
 rospy
 catkin_tools
+opencv-python
+tyro

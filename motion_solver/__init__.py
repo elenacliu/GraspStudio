@@ -1,2 +1,2 @@
-from .solver import PybulletMotionSolver, MotionSolver
+from .solver import PybulletMotionSolver, MotionSolver, PybulletMotionSolverConfig, MotionSolverConfig
 from .constants import FrankaConstants
