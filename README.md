@@ -14,7 +14,7 @@ I decompose the whole grasping system into 4 components:
 3. motion solver, under `motion_solver`
 4. camera/sensor input, under `cameras`
 
-Each components is expected to be independent from others (Ideally! but sometimes it might be hard). If you want use your own modules, feel free to add your own class by inheriting the abstract class and implementing the necessary interfaces. 
+Each component is expected to be independent from others (Ideally! but sometimes it might be hard). If you want to use your own modules, feel free to add your own class by inheriting the abstract class and implementing the necessary interfaces. 
 
 Do not forget to implement the corresponding `Config` class for your class!
 
